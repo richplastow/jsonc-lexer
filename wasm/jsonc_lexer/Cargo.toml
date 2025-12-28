@@ -1,0 +1,16 @@
+[package]
+name = "jsonc_lexer"
+version = "0.0.1"
+edition = "2021"
+description = "Minimal lexical tokenizer for JSONC, that also works for JSON."
+license = "MIT"
+repository = "git+https://github.com/richplastow/jsonc-lexer.git"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+
+[dev-dependencies]
+pretty_assertions = "1"

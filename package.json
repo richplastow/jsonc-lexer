@@ -1,0 +1,50 @@
+{
+  "name": "jsonc-lexer",
+  "version": "0.0.1",
+  "description": "Minimal lexical tokenizer for JSONC, that also works for JSON.",
+  "keywords": [
+    "json",
+    "jsonc",
+    "lexer",
+    "tokenizer"
+  ],
+  "homepage": "https://richplastow.com/jsonc-lexer/",
+  "bugs": {
+    "url": "https://github.com/richplastow/jsonc-lexer/issues"
+  },
+  "license": "MIT",
+  "author": "Rich Plastow",
+  "main": "./dist/jsonc-lexer--js-and-wasm.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/richplastow/jsonc-lexer.git"
+  },
+  "scripts": {
+    "bench": "npm run build && node scripts/benchmark.js",
+    "prebuild": "cd wasm/jsonc_lexer && wasm-pack build --target web --out-dir pkg && cd ../.. && node scripts/embed-wasm.js",
+    "build": "rollup -c && echo '\\xE2\\x9C\\x85 Build succeeded!'",
+    "postbuild": " cp dist/* docs/ && echo '\\xE2\\x9C\\x85 Copied builds to docs/ for GitHub Pages!'",
+    "check-types": "tsc --noEmit && echo '\\xE2\\x9C\\x85 No type-errors found!'",
+    "clean": "rm -rf dist docs/jsonc-lexer--*.js wasm/jsonc_lexer/{pkg,target,Cargo.lock}",
+    "dev": "static-server --no-cache .",
+    "ok": "npm run test:js && npm run check-types && npm run build && npm run test:wasm",
+    "preview": "static-server --no-cache docs",
+    "test:js": "node test.js && echo '\\xE2\\x9C\\x85 All JS tests passed!'",
+    "test:wasm": "cd wasm/jsonc_lexer && cargo test --release && echo '\\xE2\\x9C\\x85 All WASM tests passed!'",
+    "test": "npm run test:js && npm run test:wasm"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^24.8.1"
+  },
+  "engines": {
+    "node": "24.8"
+  },
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "npm@10.9.2",
+  "type": "module"
+}
