@@ -1,6 +1,6 @@
 {
   "name": "jsonc-lexer",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Minimal lexical tokenizer for JSONC, that also works for JSON.",
   "keywords": [
     "json",

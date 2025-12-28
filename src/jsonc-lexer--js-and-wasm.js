@@ -1,10 +1,17 @@
 #!/usr/bin/env node
 
 import { getWasmApi } from './wasm-loader.js';
+import { tokenizeJsonc } from './tokenize-jsonc.js';
 
 const BUILD_VARIANT = 'js-and-wasm'; // may have ".min" appended during build
-const PACKAGE_VERSION = '0.0.1'; // will be checked during build
+const PACKAGE_VERSION = '1.0.0'; // will be checked during build
 const WASM_THRESHOLD = 1000;
+
+/**
+ * @typedef {import('./tokenize-jsonc.js').Token} Token
+ * @typedef {import('./tokenize-jsonc.js').TokenizeError} TokenizeError
+ * @typedef {import('./tokenize-jsonc.js').TokenizeResult} TokenizeResult
+ */
 
 /**
  * @typedef {Object} JsoncLexerOptions
@@ -15,10 +22,11 @@ const WASM_THRESHOLD = 1000;
 /**
  * @typedef {Object} JsoncLexerDebugOutput
  * @property {string} buildVariant - The build variant used, e.g. 'js-only.min'
+ * @property {TokenizeError[]} [errors] - Any errors encountered during tokenization
  * @property {'js'|'wasm'} implementationUsed - Whether JavaScript or WASM was used to generate these tokens
  * @property {number} lengthInput - The length of the input JSONC string
  * @property {number} lengthOutput - The number of tokens generated
- * @property {string} tokens - The generated tokens
+ * @property {Token[]} tokens - The generated tokens
  * @property {string} processingTimeMs - Time taken to process the input, in milliseconds, to 3 fixed decimal places
  * @property {string} version - The jsonc-lexer package version
  */
@@ -27,7 +35,7 @@ const WASM_THRESHOLD = 1000;
  * Transforms JSONC into an array of token objects.
  * @param {string} jsoncString
  * @param {JsoncLexerOptions} [options]
- * @returns {string|JsoncLexerDebugOutput}
+ * @returns {Token[]|JsoncLexerDebugOutput}
  */
 export const jsoncLexer = (jsoncString, options = {}) => {
     let startTime;
@@ -42,28 +50,31 @@ export const jsoncLexer = (jsoncString, options = {}) => {
                 && jsoncString.length >= WASM_THRESHOLD
             );
 
-    let tokens;
+    /** @type {TokenizeResult} */
+    let result;
+
     if (shouldUseWasm) {
         const wasm = getWasmApi();
         if (wasm) {
-            tokens = wasm.jsoncLexer(jsoncString);
+            result = wasm.jsoncLexer(jsoncString);
         } else if (useWasm === 'always') throw new Error(
             'Rust WASM backend was requested but is unavailable. Rebuild the wasm package to enable it.');
     } else {
-        tokens = "[789]";
+        result = tokenizeJsonc(jsoncString);
     }
 
     // Usually, return just the tokens.
-    if (!options.debug) return tokens;
+    if (!options.debug) return result.tokens;
 
     // In debug mode, return runtime info along with the tokens.
     const processingTimeMs = performance.now() - startTime;
     return {
+        errors: result.errors,
         buildVariant: BUILD_VARIANT,
         implementationUsed: shouldUseWasm ? 'wasm' : 'js',
-        tokens,
+        tokens: result.tokens,
         lengthInput: jsoncString.length,
-        lengthOutput: tokens.length,
+        lengthOutput: result.tokens.length,
         processingTimeMs: processingTimeMs.toFixed(3),
         version: PACKAGE_VERSION,
     };

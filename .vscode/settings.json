@@ -4,7 +4,10 @@
         "Cascadia",
         "cdylib",
         "Consolas",
+        "fals",
+        "falsex",
         "Fira",
+        "nullx",
         "pdksh",
         "Plastow",
         "rgba",
@@ -13,7 +16,10 @@
         "rustc",
         "rustup",
         "Segoe",
+        "serde",
+        "truex",
         "unminified",
+        "xtrue",
         "yansi"
     ]
 }

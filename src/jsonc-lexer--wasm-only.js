@@ -3,7 +3,13 @@
 import { getWasmApi } from './wasm-loader.js';
 
 const BUILD_VARIANT = 'wasm-only'; // may have ".min" appended during build
-const PACKAGE_VERSION = '0.0.1'; // will be checked during build
+const PACKAGE_VERSION = '1.0.0'; // will be checked during build
+
+/**
+ * @typedef {import('./tokenize-jsonc.js').Token} Token
+ * @typedef {import('./tokenize-jsonc.js').TokenizeError} TokenizeError
+ * @typedef {import('./tokenize-jsonc.js').TokenizeResult} TokenizeResult
+ */
 
 /**
  * @typedef {Object} JsoncLexerOptions
@@ -14,10 +20,11 @@ const PACKAGE_VERSION = '0.0.1'; // will be checked during build
 /**
  * @typedef {Object} JsoncLexerDebugOutput
  * @property {string} buildVariant - The build variant used, e.g. 'js-only.min'
+ * @property {TokenizeError[]} [errors] - Any errors encountered during tokenization
  * @property {'js'|'wasm'} implementationUsed - Whether JavaScript or WASM was used to generate these tokens
  * @property {number} lengthInput - The length of the input JSONC string
  * @property {number} lengthOutput - The number of tokens generated
- * @property {string} tokens - The generated tokens
+ * @property {Token[]} tokens - The generated tokens
  * @property {string} processingTimeMs - Time taken to process the input, in milliseconds, to 3 fixed decimal places
  * @property {string} version - The jsonc-lexer package version
  */
@@ -26,7 +33,7 @@ const PACKAGE_VERSION = '0.0.1'; // will be checked during build
  * Transforms JSONC into an array of token objects.
  * @param {string} jsoncString
  * @param {JsoncLexerOptions} [options]
- * @returns {string|JsoncLexerDebugOutput}
+ * @returns {Token[]|JsoncLexerDebugOutput}
  */
 export const jsoncLexer = (jsoncString, options = {}) => {
     let startTime;
@@ -36,7 +43,12 @@ export const jsoncLexer = (jsoncString, options = {}) => {
     if (!wasm) throw new Error(
         'WASM-only build: Rust WASM backend failed to initialize. Rebuild the WASM package.');
 
-    const tokens = wasm.jsoncLexer(jsoncString);
+    const result = wasm.jsoncLexer(jsoncString);
+
+    /** @type {TokenizeError[]} */
+    const errors = result.errors;
+    /** @type {Token[]} */
+    const tokens = result.tokens;
 
     // Usually, return just the tokens.
     if (!options.debug) return tokens;
@@ -45,6 +57,7 @@ export const jsoncLexer = (jsoncString, options = {}) => {
     const processingTimeMs = performance.now() - startTime;
     return {
         buildVariant: BUILD_VARIANT,
+        errors,
         implementationUsed: 'wasm',
         tokens,
         lengthInput: jsoncString.length,

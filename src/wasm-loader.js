@@ -4,6 +4,10 @@ import {
 } from '../wasm/jsonc_lexer/pkg/jsonc_lexer.js';
 import { wasmBase64 } from './wasm-bytes.js';
 
+/**
+ * @typedef {import('./tokenize-jsonc.js').TokenizeResult} TokenizeResult
+ */
+
 let wasmReady = false;
 let wasmError = null;
 let cachedBytes = null;
@@ -46,7 +50,7 @@ const ensureWasm = () => {
  * Returns wasm bindings if instantiation succeeded. Otherwise `null` is
  * returned so callers can gracefully fall back to the JS implementation.
  * @returns {{
- *   jsoncLexer: (input: string) => string,
+ *   jsoncLexer: (input: string) => TokenizeResult,
  * } | null}
  */
 export const getWasmApi = () => {

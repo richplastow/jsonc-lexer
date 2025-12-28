@@ -19,7 +19,7 @@
     </style>
 
     <!-- Search engine meta -->
-    <title>jsonc-lexer v0.0.1</title>
+    <title>jsonc-lexer v1.0.0</title>
     <meta name="description"
         content="jsonc-lexer is a JavaScript library that transforms JSONC
         (JSON with Comments) into an array of token objects.
@@ -35,7 +35,7 @@
     <meta property="og:url"    content="https://richplastow.com/jsonc-lexer/">
     <meta property="og:image"
         content="https://richplastow.com/asset/logo/rich-plastow-logo-1200.png">
-    <meta property="og:title" content="jsonc-lexer v0.0.1">
+    <meta property="og:title" content="jsonc-lexer v1.0.0">
     <meta property="og:description"
         content="jsonc-lexer is a JavaScript library that transforms JSONC
         (JSON with Comments) into an array of token objects.
@@ -58,7 +58,7 @@
 </head>
 <body>
 <header>
-    <h1>jsonc-lexer v0.0.1</h1>
+    <h1>jsonc-lexer v1.0.0</h1>
     <p>jsonc-lexer is a JavaScript library that transforms JSONC (JSON with
         Comments) into an array of token objects.
     </p>
@@ -67,7 +67,7 @@
         implementation for smaller inputs and environments where WASM is not
         available.
     </p>
-    <p><a href="./bench-0.0.1.html">Latest Node.js benchmarks</a></p>
+    <p><a href="./bench-1.0.0.html">Latest Node.js benchmarks</a></p>
     <p><a href="./bench.html">Run browser benchmarks</a></p>
 </header>
 <section id="mode-controls">
@@ -95,7 +95,7 @@
     <button data-preset="pretty-array">Pretty Array</button>
     <button data-preset="schema">Schema</button>
     <button data-preset="commented-out">Commented-out</button>
-    <button data-preset="already-json">Already JSON</button>
+    <button data-preset="simple-json">Simple JSON</button>
 </section>
 <div id="input-output">
 <pre id="input" contenteditable>{
@@ -369,7 +369,7 @@ null`,
     },
   },
 }`,
-        'already-json': `{
+        'simple-json': `{
     "key1": 1,
     "key2": "TWO"
 }`,
@@ -446,18 +446,21 @@ null`,
         try {
             const output = jsoncLexer($input.innerText, { debug, useWasm: wasmMode });
             if (!debug) {
-                $output.innerText = output;
+                $output.innerText = JSON.stringify(output, null, 2);
                 return;
             }
             const { tokens } = output;
             $output.innerText =
                 `- Build variant: ${output.buildVariant}\n` +
+                `- Errors length: ${output.errors.length}\n` +
                 `- Implementation used: ${output.implementationUsed}\n` +
                 `- Input length: ${output.lengthInput} chars\n` +
                 `- Output length: ${output.lengthOutput} chars\n` +
                 `- Processing time: ${output.processingTimeMs} ms\n` +
                 `- Version: ${output.version}\n` +
-                `\n\n---\n\n${tokens}`;
+                (output.errors.length
+                  ? `\n\n---\n\nErrors: ${JSON.stringify(output.errors, null, 2)}\n` : '') +
+                `\n\n---\n\n${JSON.stringify(tokens, null, 2)}`;
         } catch (e) {
             $output.innerText = `Error: ${e.message}`;
         }

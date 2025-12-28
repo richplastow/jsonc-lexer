@@ -2,7 +2,7 @@
 
 **Minimal lexical tokenizer for JSONC, that also works for JSON.**
 
-- Version: 0.0.1
+- Version: 1.0.0
 - License: MIT
 - Created: 28th December 2025 by Rich Plastow
 - Updated: 28th December 2025 by Rich Plastow
@@ -150,7 +150,7 @@ rollup --version
 
 # Run the full build process - it starts with WASM, before running the JS build.
 npm run build
-# > jsonc-lexer@0.0.1 prebuild
+# > jsonc-lexer@1.0.0 prebuild
 # > cd wasm/jsonc_lexer && wasm-pack build --target web --out-dir pkg && cd ../.. && node scripts/embed-wasm.js
 # [INFO]: 🎯  Checking for the Wasm target...
 # [INFO]: 🌀  Compiling to Wasm...
@@ -161,7 +161,7 @@ npm run build
 # [INFO]: 📦   Your wasm pkg is ready to publish at ... jsonc-lexer/wasm/jsonc_lexer/pkg.
 # ✅ Embedded WASM binary to ... jsonc-lexer/src/wasm-bytes.js (160 lines)
 # 
-# > jsonc-lexer@0.0.1 build
+# > jsonc-lexer@1.0.0 build
 # ...
 # src/jsonc-lexer--js-and-wasm.js → dist/jsonc-lexer--js-and-wasm.js...
 # created dist/jsonc-lexer--js-and-wasm.js in 29ms
